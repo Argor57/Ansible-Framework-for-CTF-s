@@ -1,0 +1,20 @@
+---
+- name: Binary Vulnerability Scanning
+  hosts: raspberrypi
+  become: yes
+  vars:
+    binary_path: ""  # Default empty, should be overridden at runtime
+
+  tasks:
+    - name: Check if specified path is a binary and scan for vulnerabilities
+      command: python3 /home/pi/ansible-modules/binary_vuln_scan.py "{{ binary_path }}"
+      register: vuln_scan_output
+      ignore_errors: yes
+
+    - name: Fetch the vulnerability scan documentation if the scan was successful
+      fetch:
+        src: "{{ vuln_scan_output.stdout_lines[0] }}"
+        dest: "./tmp/{{ inventory_hostname }}_vuln_scan/"
+        flat: yes
+      when: vuln_scan_output.rc == 0
+

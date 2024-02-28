@@ -1,0 +1,23 @@
+---
+- name: Cryptography Analysis
+  hosts: raspberrypi
+  gather_facts: no
+  vars:
+    script_path: /home/pi/ansible-modules/crypto_analysis.py
+    file_path: "{{ file_path }}"
+    known_plaintext: "{{ known_plaintext | default('') }}"
+
+  tasks:
+    - name: Execute cryptography analysis script on Raspberry Pi
+      command: >
+        python3 "{{ script_path }}" "{{ file_path }}"
+        {% if known_plaintext %} --known-plaintext "{{ known_plaintext }}" {% endif %}
+      register: analysis_result
+      ignore_errors: yes
+
+    - name: Fetch analysis report
+      fetch:
+        src: "/home/ansible-modules/{{ analysis_result.stdout }}"
+        dest: "./tmp/"
+        flat: yes
+

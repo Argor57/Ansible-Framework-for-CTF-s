@@ -1,0 +1,20 @@
+---
+- name: Forensics Analysis
+  hosts: raspberrypi
+  gather_facts: no
+  vars:
+    analysis_script: /home/pi/ansible-modules/forensics_analysis.py
+    file_path: ''
+
+  tasks:
+    - name: Execute forensics analysis script on Raspberry Pi
+      command: python3 "{{ analysis_script }}" "{{ file_path }}"
+      register: analysis_result
+      ignore_errors: yes
+
+    - name: Fetch analysis report
+      fetch:
+        src: "/home/ansible-modules/{{ analysis_result.stdout_lines[0] }}"
+        dest: "./tmp/"
+        flat: yes
+

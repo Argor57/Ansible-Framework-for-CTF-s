@@ -1,0 +1,17 @@
+---
+- name: Manage VPN connection on Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Start the VPN connection in the background
+      ansible.builtin.shell: "nohup openvpn --config /home/pi/htb/lab.ovpn &"
+      async: 10
+      poll: 0
+
+    - name: Wait for manual interruption
+      ansible.builtin.pause:
+        prompt: "Press Enter to stop the VPN and exit playbook"
+
+    - name: Stop the VPN connection
+      ansible.builtin.shell: "killall openvpn"
+

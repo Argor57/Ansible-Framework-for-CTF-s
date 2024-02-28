@@ -1,0 +1,22 @@
+---
+- name: Copy ansible-modules directory and create tmp directory on Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Copy ansible-modules directory to target
+      ansible.builtin.copy:
+        src: ./ansible-modules/
+        dest: /home/pi/ansible-modules/
+        owner: pi
+        group: pi
+        mode: '0755'
+        remote_src: no
+
+    - name: Ensure /home/pi/ansible-modules/tmp directory exists
+      ansible.builtin.file:
+        path: /home/pi/ansible-modules/tmp
+        state: directory
+        owner: pi
+        group: pi
+        mode: '0755'
+

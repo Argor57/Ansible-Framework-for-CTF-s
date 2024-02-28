@@ -1,0 +1,34 @@
+---
+- name: Download and Fetch Entire Website
+  hosts: all
+  gather_facts: no
+  vars:
+    url: "{{ url }}"
+    sanitized_url: "{{ url | replace('://', '_') | replace('/', '_') | replace(':', '_') | replace('?', '_') | replace('&', '_') }}"
+  tasks:
+    - name: Download entire website
+      ansible.builtin.command: >
+        python3 /home/pi/ansible-modules/download_website.py "{{ url }}"
+      register: download_cmd
+
+    - name: Archive the downloaded website on the remote host
+      ansible.builtin.command: >
+        tar -czf /home/pi/websites/{{ sanitized_url }}.tar.gz -C /home/pi/websites/ {{ sanitized_url }}
+      args:
+        chdir: "/home/pi/websites/"
+      register: archive_cmd
+
+    - name: Fetch the archive to the local machine
+      ansible.builtin.fetch:
+        src: "/home/pi/websites/{{ sanitized_url }}.tar.gz"
+        dest: "./tmp/"
+        flat: yes
+
+    - name: Extract the archive locally
+      ansible.builtin.unarchive:
+        src: "./tmp/{{ sanitized_url }}.tar.gz"
+        dest: "./tmp/"
+        remote_src: no
+      delegate_to: localhost
+      when: archive_cmd is changed
+

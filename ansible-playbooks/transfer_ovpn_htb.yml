@@ -1,0 +1,26 @@
+---
+- name: Transfer OpenVPN Config to Raspberry Pi
+  hosts: raspberrypi
+  become: yes 
+  vars:
+    local_ovpn_path: "./example.ovpn"  # Adjust this path to where your .ovpn file is located
+    remote_ovpn_directory: "/home/pi/htb/"
+    remote_ovpn_filename: "lab.ovpn"  # Renaming the file
+
+  tasks:
+    - name: Ensure the HTB directory exists
+      ansible.builtin.file:
+        path: "{{ remote_ovpn_directory }}"
+        state: directory
+        mode: '0755'
+        owner: pi
+        group: pi
+
+    - name: Transfer OpenVPN config file to Raspberry Pi
+      ansible.builtin.copy:
+        src: "{{ local_ovpn_path }}"
+        dest: "{{ remote_ovpn_directory }}{{ remote_ovpn_filename }}"
+        mode: '0644'
+        owner: pi
+        group: pi
+

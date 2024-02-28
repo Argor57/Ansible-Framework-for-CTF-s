@@ -1,0 +1,21 @@
+---
+- name: Fetch current date and time from Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Execute get_datetime script on Raspberry Pi
+      ansible.builtin.command: /home/pi/ansible-modules/save_datetime.py
+      args:
+        chdir: /home/pi/ansible-modules/
+      register: datetime_result
+
+    - name: Debug output from script
+      ansible.builtin.debug:
+        msg: "{{ datetime_result.stdout }}"
+
+    - name: Fetch the current datetime file
+      ansible.builtin.fetch:
+        src: /home/pi/ansible-modules/tmp/current_datetime.txt
+        dest: ./tmp/
+        flat: yes
+

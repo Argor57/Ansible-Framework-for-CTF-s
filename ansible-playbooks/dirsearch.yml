@@ -1,0 +1,19 @@
+---
+- name: Directory Search Playbook
+  hosts: raspberrypi
+  gather_facts: no
+
+  vars:
+    target_url: "{{ url }}"  # Passed via -e "url=http://example.com"
+
+  tasks:
+    - name: Execute dirsearch through wrapper script
+      ansible.builtin.command: python3 /home/pi/ansible-modules/dirsearch.py "{{ target_url }}"
+      register: script_output
+
+    - name: Fetch dirsearch results to local machine
+      ansible.builtin.fetch:
+        src: "{{ script_output.stdout_lines[0] }}"
+        dest: "./tmp/"
+        flat: yes
+

@@ -1,0 +1,17 @@
+---
+- name: Add Host Playbook
+  hosts: all
+  gather_facts: no
+  vars:
+    ip_address: "" #get from command line 
+    host_name: "" #get from command line
+
+  tasks:
+    - name: Add or update host entry
+      ansible.builtin.command: python3 /home/pi/ansible-modules/add_hosts.py "{{ ip_address }}" "{{ host_name }}"
+      register: script_output
+      become: yes  # Ensures the task is run with root privileges
+
+    - name: Show script output
+      ansible.builtin.debug:
+        msg: "{{ script_output.stdout }}"

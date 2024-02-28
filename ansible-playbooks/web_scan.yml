@@ -1,0 +1,20 @@
+---
+- name: Web Scan Playbook
+  hosts: all
+  gather_facts: no
+  become: yes #run as sudo
+  vars:
+    ip_address: "{{ ip_address }}"  # Passed via -e "ip_address=x.x.x.x"
+
+  tasks:
+    - name: Run web scan
+      ansible.builtin.command: python3 /home/pi/ansible-modules/web_scan.py {{ ip_address }}
+      register: scan_output
+
+    - name: Fetch scan results to local machine
+      ansible.builtin.fetch:
+        src: "{{ scan_output.stdout_lines[0] }}"
+        dest: "./tmp/"
+        flat: yes
+      when: scan_output.stdout != ''
+

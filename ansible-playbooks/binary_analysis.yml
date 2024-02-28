@@ -1,0 +1,20 @@
+---
+- name: Binary File Analysis
+  hosts: raspberrypi
+  become: yes
+  vars:
+    binary_path: ""  # This will be set when running the playbook
+
+  tasks:
+    - name: Analyze the binary file and generate documentation
+      command: python3 /home/pi/ansible-modules/binary_analysis.py "{{ binary_path }}"
+      register: analysis_output
+      ignore_errors: yes
+
+    - name: Fetch the analysis documentation if the analysis was successful
+      fetch:
+        src: "{{ analysis_output.stdout_lines[0] }}"
+        dest: "./tmp/{{ inventory_hostname }}_binary_analysis/"
+        flat: yes
+      when: analysis_output.rc == 0
+

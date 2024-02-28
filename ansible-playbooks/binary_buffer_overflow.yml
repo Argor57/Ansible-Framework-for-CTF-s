@@ -1,0 +1,30 @@
+---
+- name: Run Buffer Overflow Exploit
+  hosts: raspberrypi
+  gather_facts: no
+  vars:
+    script_path: /path/on/raspberry/to/binary_buffer_overflow_template.py
+    binary_or_ip: "{{ binary_or_ip }}"
+    port: "{{ port | default('') }}"
+  tasks:
+    - name: Transfer exploit script to Raspberry Pi
+      ansible.builtin.copy:
+        src: ./binary_buffer_overflow.py    #Path to own Script
+        dest: "{{ script_path }}"
+        mode: '0755'
+    
+    - name: Execute exploit script on target
+      ansible.builtin.command:
+        cmd: "python3 {{ script_path }} {{ binary_or_ip }} {{ port }}"
+      register: exploit_result
+
+    - name: Show exploit output
+      ansible.builtin.debug:
+        var: exploit_result.stdout
+
+    - name: Fetch exploit output back to localhost
+      ansible.builtin.fetch:
+        src: "{{ script_path }}_output.txt"
+        dest: "./tmp/"
+        flat: yes
+

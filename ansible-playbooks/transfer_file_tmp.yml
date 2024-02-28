@@ -1,0 +1,11 @@
+---
+- name: Transfer File to Raspberry Pi
+  hosts: raspberrypi
+  vars:
+    local_file_path: ""  # Placeholder for the file path variable
+  tasks:
+    - name: Copy file to Raspberry Pi
+      ansible.builtin.copy:
+        src: "{{ local_file_path }}"
+        dest: "/home/pi/ansible-modules/tmp/"
+

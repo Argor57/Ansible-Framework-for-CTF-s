@@ -1,0 +1,13 @@
+---
+- name: Update and Upgrade Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Update apt repo 
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+
